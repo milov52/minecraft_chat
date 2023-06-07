@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 TOKEN = '5161ea5a-0482-11ee-ad76-0242ac110002'
 
 
-async def auth(reader, writer):
+async def authorise(reader, writer):
     data = await reader.readline()
     logging.debug(data.decode().strip())
 
@@ -30,7 +30,7 @@ async def auth(reader, writer):
     logging.debug(data.decode().strip())
 
 
-async def write_to_chat(writer, reader):
+async def submit_message(writer, reader):
     while True:
         message = input()
         writer.write(message.encode()+b'\n\n')
@@ -42,8 +42,8 @@ async def write_to_chat(writer, reader):
 
 async def main(params):
     reader, writer = await asyncio.open_connection(params.host, 5050)
-    await auth(reader, writer)
-    await write_to_chat(writer, reader)
+    await authorise(reader, writer)
+    await submit_message(writer, reader)
 
 
 if __name__ == '__main__':
