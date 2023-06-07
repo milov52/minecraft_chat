@@ -1,9 +1,11 @@
 import argparse
+import logging
 
 SERVER_HOST = 'minechat.dvmn.org'
 SERVER_PORT = 5000
 FILE_PATH = 'minechat.history'
 
+logging.basicConfig(level=logging.DEBUG)
 
 def configure_argument_parser():
     parser = argparse.ArgumentParser(

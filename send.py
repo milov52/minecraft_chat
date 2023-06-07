@@ -1,7 +1,7 @@
 import asyncio
-import logging
+# import logging
 
-from config import configure_argument_parser
+from config import configure_argument_parser, logging
 
 DATE_TIME_FORMAT = '[%d.%m.%y %H:%M] '
 logging.basicConfig(level=logging.INFO)
@@ -10,16 +10,16 @@ TOKEN = '5161ea5a-0482-11ee-ad76-0242ac110002'
 
 async def auth(reader, writer):
     data = await reader.readline()
-    print(data.decode(), end='')
+    logging.debug(data.decode().strip())
 
     token = TOKEN.encode()
     writer.write(token + b'\n')
     await writer.drain()
 
     data = await reader.readline()
-    print(data.decode(), end='')
+    logging.debug(data.decode().strip())
     data = await reader.readline()
-    print(data.decode(), end='')
+    logging.debug(data.decode().strip())
 
 
 async def write_to_chat(writer, reader):
@@ -29,7 +29,7 @@ async def write_to_chat(writer, reader):
         await writer.drain()
 
         chat_data = await reader.readuntil(b'\n')
-        print(chat_data.decode(), end='')
+        logging.debug(chat_data.decode().strip())
 
 
 async def main(params):

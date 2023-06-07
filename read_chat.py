@@ -8,7 +8,7 @@ from datetime import datetime
 from config import configure_argument_parser
 
 DATE_TIME_FORMAT = '[%d.%m.%y %H:%M] '
-logging.basicConfig(level=logging.INFO)
+
 TOKEN = '5161ea5a-0482-11ee-ad76-0242ac110002'
 
 async def read_chat(params):
