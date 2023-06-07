@@ -1,4 +1,6 @@
 import asyncio
+import json
+
 # import logging
 
 from config import configure_argument_parser, logging
@@ -12,12 +14,18 @@ async def auth(reader, writer):
     data = await reader.readline()
     logging.debug(data.decode().strip())
 
-    token = TOKEN.encode()
-    writer.write(token + b'\n')
+    token = input("Input token\n")
+    writer.write(token.encode() + b'\n')
     await writer.drain()
 
     data = await reader.readline()
-    logging.debug(data.decode().strip())
+    if json.loads(data) is None:
+        logging.debug("Неизвестный токен. Проверьте его или зарегистрируйте заново")
+        return
+
+    data = json.loads(data)
+    logging.debug(data)
+
     data = await reader.readline()
     logging.debug(data.decode().strip())
 

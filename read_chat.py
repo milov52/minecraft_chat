@@ -23,7 +23,7 @@ async def read_chat(params):
         chat_data = now.strftime(DATE_TIME_FORMAT) + chat_data.decode()
         async with aiofiles.open(params.history, "a") as myfile:
             await myfile.write(chat_data)
-        print(chat_data, end='')
+        print(chat_data.strip())
 
 if __name__ == '__main__':
     arg_parser = configure_argument_parser()
