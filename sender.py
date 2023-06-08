@@ -6,12 +6,14 @@ import aiofiles
 from config import configure_sender_argument_parser, logging
 
 
-async def register(reader, writer):
+async def register(reader, writer, username):
+    writer.write(b'\n')
+    await writer.drain()
+
     data = await reader.readline()
     logging.debug(data.decode().strip())
 
-    nickname = input()
-    writer.write(nickname.encode() + b'\n')
+    writer.write(username.encode() + b'\n')
     await writer.drain()
 
     register_data = await reader.readline()
@@ -25,7 +27,10 @@ async def register(reader, writer):
     logging.debug(data.decode().strip())
 
 
-async def authorise(reader, writer):
+async def authorise(reader, writer, token):
+    writer.write(token.encode() + b'\n')
+    await writer.drain()
+
     data = await reader.readline()
 
     if json.loads(data) is None:
@@ -36,38 +41,30 @@ async def authorise(reader, writer):
     logging.debug(data.decode().strip())
 
 
-async def submit_message(writer, reader):
-    while True:
-        message = ''
-        while True:
-            input_data = input()
-            message += input_data + '\n'
+async def submit_message(writer, reader, message):
+    message = message.replace("\\n", "\n")
+    text = message + '\n\n'
 
-            if not input_data:
-                break
+    writer.write(text.encode())
+    await writer.drain()
 
-        writer.write(message.encode())
-        await writer.drain()
-
-        chat_data = await reader.readuntil(b'\n')
-        logging.debug(chat_data.decode().strip())
+    chat_data = await reader.readline()
+    logging.debug(chat_data.decode().strip())
 
 
 async def main(params):
-    reader, writer = await asyncio.open_connection(params.host, 5050)
+    reader, writer = await asyncio.open_connection(params.server, params.port)
     data = await reader.readline()
     logging.debug(data.decode().strip())
 
-    token = input()
-    writer.write(token.encode() + b'\n')
-    await writer.drain()
+    token = params.token
 
-    if token == '':
-        await register(reader, writer)
+    if token is None:
+        await register(reader, writer, params.username)
     else:
-        await authorise(reader, writer)
+        await authorise(reader, writer, token)
 
-    await submit_message(writer, reader)
+    await submit_message(writer, reader, params.message)
 
 
 if __name__ == '__main__':
