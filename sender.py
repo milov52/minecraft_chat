@@ -34,7 +34,7 @@ async def authorise(reader, writer, token):
 
     data = await reader.readline()
 
-    if json.loads(data) is None:
+    if not json.loads(data):
         logging.error("Неизвестный токен. Проверьте его или зарегистрируйте заново")
         raise
 
@@ -64,13 +64,12 @@ async def open_connection(params):
 
 async def main(params):
     async with open_connection(params) as (reader, writer):
-        # reader, writer = await asyncio.open_connection(params.server, params.port)
         data = await reader.readline()
         logging.debug(data.decode().strip())
 
         token = params.token
 
-        if token is None:
+        if not token:
             await register(reader, writer, params.username)
         else:
             await authorise(reader, writer, token)
