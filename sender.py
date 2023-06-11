@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import json
 
 import aiofiles
@@ -52,19 +53,30 @@ async def submit_message(writer, reader, message):
     logging.debug(chat_data.decode().strip())
 
 
-async def main(params):
+@contextlib.asynccontextmanager
+async def open_connection(params):
     reader, writer = await asyncio.open_connection(params.server, params.port)
-    data = await reader.readline()
-    logging.debug(data.decode().strip())
+    try:
+        yield reader, writer
+    finally:
+        writer.close()
+        await writer.wait_closed()
 
-    token = params.token
+async def main(params):
+    async with open_connection(params) as (reader, writer):
+        # reader, writer = await asyncio.open_connection(params.server, params.port)
+        data = await reader.readline()
+        logging.debug(data.decode().strip())
 
-    if token is None:
-        await register(reader, writer, params.username)
-    else:
-        await authorise(reader, writer, token)
+        token = params.token
 
-    await submit_message(writer, reader, params.message)
+        if token is None:
+            await register(reader, writer, params.username)
+        else:
+            await authorise(reader, writer, token)
+
+        await submit_message(writer, reader, params.message)
+
 
 
 if __name__ == '__main__':
