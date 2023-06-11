@@ -33,7 +33,7 @@ def configure_reader_argument_parser():
     )
 
     parser.add_argument(
-        "-f"
+        "-f",
         "--file_path",
         help="Путь к файлу для сохранения результатов",
         default=FILE_PATH
